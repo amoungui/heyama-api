@@ -3,7 +3,10 @@
 // api/src/objects/s3.service.ts
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
-import { v4 as uuidv4 } from 'uuid';
+// import * as uuid from 'uuid';
+// const uuidv4 = uuid.v4;
+
+import { randomUUID } from 'crypto'; // Natif dans Node.js
 
 @Injectable()
 export class S3Service implements OnModuleInit {
@@ -61,7 +64,8 @@ export class S3Service implements OnModuleInit {
   async uploadFile(
     file: Express.Multer.File,
   ): Promise<{ url: string; key: string }> {
-    const key = `objects/${uuidv4()}-${file.originalname}`;
+    // const key = `objects/${uuidv4()}-${file.originalname}`;
+    const key = `objects/${randomUUID()}-${file.originalname}`;
 
     this.logger.log(`Uploading file: ${key}, size: ${file.size} bytes`);
 
