@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Ton API NestJS
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb://mongodb:27017/ma_base
+      - MINIO_ENDPOINT=minio
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
+    depends_on:
+      - mongodb
+      - minio
+
+  # Ta base de données
+  mongodb:
+    image: mongo:latest
+    # container_name est souvent ignoré sur Railway, le nom du service suffit
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+  # Ton stockage objet
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    # Important : Enlever MINIO_DOMAIN: localhost qui bloque les accès externes
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+  minio_data:
