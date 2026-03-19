@@ -15,20 +15,13 @@ export class S3Service implements OnModuleInit {
   private readonly bucketName = process.env.MINIO_BUCKET || 'heyama-objects';
 
   constructor() {
-    // Railway utilise le nom du service (minio) pour la communication interne
-    const endpoint = process.env.MINIO_ENDPOINT || 'http://minio:9000';
-    const accessKeyId = process.env.MINIO_ROOT_USER || 'minioadmin';
-    const secretAccessKey = process.env.MINIO_ROOT_PASSWORD || 'minioadmin';
-
     this.s3 = new AWS.S3({
-      endpoint: endpoint,
-      accessKeyId: accessKeyId,
-      secretAccessKey: secretAccessKey,
-      s3ForcePathStyle: true, // Requis pour MinIO
+      endpoint: process.env.MINIO_ENDPOINT, // Prendra http://minio:9000
+      accessKeyId: process.env.MINIO_ACCESS_KEY,
+      secretAccessKey: process.env.MINIO_SECRET_KEY,
+      s3ForcePathStyle: true,
       signatureVersion: 'v4',
     });
-
-    this.logger.log(`S3 Service initialized with endpoint: ${endpoint}`);
   }
 
   async onModuleInit(): Promise<void> {
